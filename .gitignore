@@ -1,5 +1,10 @@
+x64/
+Debug/
 # Prerequisites
 *.d
+
+# Project files
+SimpleML.*
 
 # Compiled Object files
 *.slo
@@ -25,6 +30,7 @@
 *.la
 *.a
 *.lib
+*.txt
 
 # Executables
 *.exe
