@@ -25,10 +25,10 @@ namespace sm {
 
 	nc::NdArray<double> euclidean(const nc::NdArray<double>& node, const nc::NdArray<double>& X) {
 		nc::Shape s = X.shape();
-		nc::NdArray<double> dis = nc::sum((X - node) * (X - node), nc::Axis::COL);
-		dis.reshape(s.rows, 1);
+		nc::NdArray<double> dist = nc::sum((X - node) * (X - node), nc::Axis::COL);
+		dist.reshape(s.rows, 1);
 
-		return dis;
+		return dist;
 	}
 
 	double shannon_ent(nc::NdArray<double>& data) {

@@ -6,18 +6,24 @@ namespace sm {
 		class KMeans
 		{
 		public:
-			KMeans(int n_clusters = 8);
+			KMeans(int n_clusters = 8, int max_iter = 100);
 			~KMeans();
-			void fit(const nc::NdArray<double>& X, const nc::NdArray<double>& Y);
+			void fit(const nc::NdArray<double>& X, const nc::NdArray<int>& Y);
 			void fit(const nc::NdArray<double>& X);
-			nc::NdArray<double> predict(const nc::NdArray<double>& X);
+			nc::NdArray<int> predict(const nc::NdArray<double>& X);
 
 			int n_clusters_;
+			int max_iter_;
 			nc::NdArray<double> centroids_;
-			nc::NdArray<double> labels_;
+			nc::NdArray<int> labels_;
+
+		private:
+			void init_centroids(const nc::NdArray<double>& X);
 		};
 
-		KMeans::KMeans(int n_clusters) : n_clusters_(n_clusters)
+		KMeans::KMeans(int n_clusters, int max_iter) : 
+			n_clusters_(n_clusters),
+			max_iter_(max_iter)
 		{
 		}
 
@@ -25,73 +31,62 @@ namespace sm {
 		{
 		}
 
-		void KMeans::fit(const nc::NdArray<double>& X, const nc::NdArray<double>& Y) {
+		void KMeans::init_centroids(const nc::NdArray<double>& X) {
+			nc::Shape s = X.shape();
+			centroids_ = nc::NdArray<double>(n_clusters_, s.cols);
+
+			nc::NdArray<double> X_min = nc::min(X, nc::Axis::ROW);
+			nc::NdArray<double> X_max = nc::max(X, nc::Axis::ROW);
+			for (int col = 0; col < s.cols; ++col) {
+				centroids_.assignCol(col, nc::Random<double>::randFloat(nc::Shape(n_clusters_, 1), X_min(0, col), X_max(0, col)));
+			}
+		}
+
+		void KMeans::fit(const nc::NdArray<double>& X, const nc::NdArray<int>& Y) {
 			fit(X);
 		}
 
 		void KMeans::fit(const nc::NdArray<double>& X) {
 			nc::Shape s = X.shape();
-			centroids_ = nc::zeros<double>(n_clusters_, s.cols);
-			for (int i = 0; i < s.cols; ++i) {
-				double min_i = nc::min(X(X.rSlice(), i))(0, 0);
-				double max_i = nc::max(X(X.rSlice(), i))(0, 0);
-				for (int k = 0; k < n_clusters_; ++k)
-					centroids_(k, i) = rand() / double(RAND_MAX) * (max_i - min_i) + min_i;
-			}
 
-			labels_ = nc::zeros<double>(s.rows, 2);
-			labels_ = -1;
-			bool change = true;
-			while (change) {
-				change = false;
+			init_centroids(X);
+			labels_ = nc::nans<int>(s.rows, 1);
 
-				for (int i = 0; i < s.rows; ++i) {
-					double min_dist = INT_MAX;
-					int min_index = -1;
-					for (int j = 0; j < n_clusters_; ++j) {
-						double dist_j = euclidean(X(i, X.cSlice()), centroids_(j, centroids_.cSlice()))(0, 0);
-						if (dist_j < min_dist) {
-							min_dist = dist_j;
-							min_index = j;
-						}
-					}
+			nc::NdArray<double> dist = nc::zeros<double>(s.rows, n_clusters_);
 
-					if (int(labels_(i, 0)) != min_index) {
+			for (int iter = 0; iter < max_iter_; ++iter) {
+				bool change = false;
+
+				//将每个样本点分配到最近的簇中
+				for (int row = 0; row < s.rows; ++row) {
+					nc::NdArray<double> cur_dist = euclidean(X(row, X.cSlice()), centroids_);
+					cur_dist.reshape(1, n_clusters_);
+					dist.assignRow(row, cur_dist);
+					int next_index = nc::argmin(cur_dist, nc::Axis::COL)(0, 0);
+					if (labels_[row] != next_index) {
 						change = true;
-						labels_(i, 0) = min_index;
-						labels_(i, 1) = min_dist;
+						labels_[row] = next_index;
 					}
 				}
 
-				nc::NdArray<double> count = nc::zeros<double>(n_clusters_, s.cols + 1);
-				// 更新质心
-				for (int i = 0; i < s.rows; ++i) {
-					int k = (int)labels_(i, 0);
-					for (int j = 0; j < s.cols; ++j)
-						count(k, j) += X(i, j);
-					count(k, s.cols) += 1;
+				//如果质心不再改变，则跳出循环
+				if (!change)
+					break;
+				
+				//更新质心
+				for (int k = 0; k < n_clusters_; ++k) {
+					nc::NdArray<double> cluster_k = X[labels_ == k];
+					centroids_.assignRow(k, nc::sum(cluster_k, nc::Axis::COL) / cluster_k.shape().cols);
 				}
-
-				for (int k = 0; k < n_clusters_; ++k)
-					for (int j = 0; j < s.cols; ++j)
-						centroids_(k, j) = count(k, j) / count(k, s.cols);
 			}
 		}
 
-		nc::NdArray<double> KMeans::predict(const nc::NdArray<double> & X) {
+		nc::NdArray<int> KMeans::predict(const nc::NdArray<double> & X) {
 			nc::Shape s = X.shape();
-			nc::NdArray<double> Y_predict(s.rows, 1);
-			for (int i = 0; i < s.rows; ++i) {
-				double min_dist = INT_MAX;
-				int min_index = -1;
-				for (int k = 0; k < n_clusters_; ++k) {
-					double dist = euclidean(X(i, X.cSlice()), centroids_(k, centroids_.cSlice()))(0, 0);
-					if (dist < min_dist) {
-						min_dist = dist;
-						min_index = k;
-					}
-				}
-				Y_predict(i, 0) = min_index;
+			nc::NdArray<int> Y_predict(s.rows, 1);
+			for (int row = 0; row < s.rows; ++row) {
+				nc::NdArray<double> cur_dist = euclidean(X(row, X.cSlice()), centroids_);
+				Y_predict[row] = nc::argmin(cur_dist, nc::Axis::ROW)(0, 0);
 			}
 
 			return Y_predict;

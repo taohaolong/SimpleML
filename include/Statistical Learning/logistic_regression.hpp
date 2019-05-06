@@ -10,7 +10,7 @@ namespace sm {
 			double intercept_;
 			int n_iter_;
 
-			LogisticRegression(std::string penalty = "l2", double tol = 0.0001, double lr = 0.01, double C = 1.0, bool fit_intercept = true, double random_state = 0, int max_iter = 100);
+			LogisticRegression(std::string penalty = "l2", double tol = 0.0001, double lr = 0.01, double C = 1.0, bool fit_intercept = true, int random_state = 0, int max_iter = 100);
 			~LogisticRegression();
 
 			void fit(const nc::NdArray<double>& X, const nc::NdArray<double>& y);
@@ -22,11 +22,11 @@ namespace sm {
 			double lr_;
 			double C_;
 			bool fit_intercept_;
-			double random_state_;
+			int random_state_;
 			int max_iter_;
 		};
 
-		LogisticRegression::LogisticRegression(std::string penalty, double tol, double lr, double C, bool fit_intercept, double random_state, int max_iter) :
+		LogisticRegression::LogisticRegression(std::string penalty, double tol, double lr, double C, bool fit_intercept, int random_state, int max_iter) :
 			penalty_(penalty),
 			tol_(tol),
 			lr_(lr),
