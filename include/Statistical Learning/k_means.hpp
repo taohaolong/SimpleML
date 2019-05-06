@@ -37,6 +37,7 @@ namespace sm {
 
 			nc::NdArray<double> X_min = nc::min(X, nc::Axis::ROW);
 			nc::NdArray<double> X_max = nc::max(X, nc::Axis::ROW);
+
 			for (int col = 0; col < s.cols; ++col) {
 				centroids_.assignCol(col, nc::Random<double>::randFloat(nc::Shape(n_clusters_, 1), X_min(0, col), X_max(0, col)));
 			}
@@ -76,7 +77,8 @@ namespace sm {
 				//更新质心
 				for (int k = 0; k < n_clusters_; ++k) {
 					nc::NdArray<double> cluster_k = X[labels_ == k];
-					centroids_.assignRow(k, nc::sum(cluster_k, nc::Axis::COL) / cluster_k.shape().cols);
+
+					centroids_.assignRow(k, nc::sum(cluster_k, nc::Axis::ROW) / cluster_k.shape().rows);
 				}
 			}
 		}
