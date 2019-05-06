@@ -28,6 +28,10 @@ namespace sm {
 	};
 }
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4018)
+#endif
+
 //工具箱
 #include "Utils/load_dataset.hpp"
 #include "Utils/constants.hpp"
