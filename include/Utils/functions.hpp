@@ -87,5 +87,18 @@ namespace sm {
 		nc::NdArray<double> ret = nc::diagonal(num / denom);
 		return ret;
 	}
+
+	std::vector<int> sample(const std::vector<int>& v, int num)
+	{
+		std::vector<int> v_copy(v);
+		std::vector<int> ret(num, 0);
+		std::random_device rd;
+		std::mt19937 g(rd());
+
+		std::shuffle(v_copy.begin(), v_copy.end(), g);
+		ret.assign(v_copy.begin(), v_copy.begin() + num);
+		std::sort(ret.begin(), ret.end());
+		return ret;
+	}
 }
 #endif // !FUNCTIONS_HPP
