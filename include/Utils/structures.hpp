@@ -7,7 +7,7 @@ namespace sm {
 		{
 			int attr_index_;
 			double attr_value_;
-			int label_;
+			double label_;
 			bool is_leaf_;
 			Node* left_;
 			Node* right_;

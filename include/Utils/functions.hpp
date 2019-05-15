@@ -94,6 +94,11 @@ namespace sm {
 		return g;
 	}
 
+	double mse(const nc::NdArray<double>& data)
+	{
+		return nc::sum(nc::power(data - nc::mean(data, nc::Axis::ROW), 2), nc::Axis::ROW)[0];
+	}
+
 	nc::NdArray<double> multivariate_normal(const nc::NdArray<double>& X, const nc::NdArray<double> mu, const nc::NdArray<double> sigma)
 	{
 		nc::Shape s = X.shape();
