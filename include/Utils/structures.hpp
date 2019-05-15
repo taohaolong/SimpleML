@@ -9,37 +9,41 @@ namespace sm {
 			double attr_value_;
 			int label_;
 			bool is_leaf_;
-			std::vector<Node*> children_;
+			Node* left_;
+			Node* right_;
 
 			Node() : 
 				attr_index_(-1),
 				attr_value_(-1),
 				label_(-1), 
-				is_leaf_(false) 
+				is_leaf_(true),
+				left_(NULL),
+				right_(NULL)
 			{
 
 			}
 
 			~Node() {
-				children_.clear();
+				delete left_;
+				delete right_;
 			}
 		};
 
-		void print_tree(Node* p, int depth = 0) {
+		void print_tree(Node* root, int depth = 0) {
 			for (int i = 0; i < depth; ++i)
 				std::cout << "└───";
 
-			std::cout << "attr_index: " << p->attr_index_ << ", attr_value: " << p->attr_value_;
-
-			if (p->is_leaf_) {
-				std::cout << ", lable: " << p->label_ << std::endl;
+			if (root->is_leaf_) {
+				std::cout << "**leaf(lable: " << root->label_ << ")**" << std::endl;
 				return;
 			}
 
+			std::cout << "node(index: " << root->attr_index_ << ", value: " << root->attr_value_ << ")";
+
 			std::cout << std::endl;
 
-			for (Node* c : p->children_)
-				print_tree(c, depth + 1);
+			print_tree(root->left_, depth + 1);
+			print_tree(root->right_, depth + 1);
 		}
 	}
 }

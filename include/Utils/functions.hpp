@@ -79,6 +79,21 @@ namespace sm {
 		return ent;
 	}
 
+	double gini(const nc::NdArray<int>& data)
+	{
+		nc::Shape s = data.shape();
+		std::unordered_map<int, int> label_count = values_count(data);
+
+		double g = 1, prob = 0;
+		for (std::unordered_map<int, int>::iterator it = label_count.begin(); it != label_count.end(); ++it)
+		{
+			prob = (double)it->second / s.rows;
+			g -= prob * prob;
+		}
+
+		return g;
+	}
+
 	nc::NdArray<double> multivariate_normal(const nc::NdArray<double>& X, const nc::NdArray<double> mu, const nc::NdArray<double> sigma)
 	{
 		nc::Shape s = X.shape();

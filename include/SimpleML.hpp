@@ -2,9 +2,12 @@
 #define SIMPLEML_HPP
 
 #include <cmath>
+#include <random>
 #include <iostream>
 #include <vector>
 #include <string>
+#include <utility>
+#include <numeric>
 #include <unordered_map>
 #include <boost/algorithm/string.hpp>
 
@@ -43,6 +46,7 @@ namespace sm {
 
 //统计学习
 #include "Statistical Learning/decision_tree_classifier.hpp"
+#include "Statistical Learning/decision_tree_regressor.hpp"
 #include "Statistical Learning/gaussian_mixture.hpp"
 #include "Statistical Learning/k_means.hpp"
 #include "Statistical Learning/k_neighbors_classifier.hpp"
