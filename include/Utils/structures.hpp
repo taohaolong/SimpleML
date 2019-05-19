@@ -23,7 +23,8 @@ namespace sm {
 
 			}
 
-			~Node() {
+			~Node()
+			{
 				delete left_;
 				delete right_;
 			}

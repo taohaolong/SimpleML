@@ -38,7 +38,7 @@ namespace sm {
 			std::pair<int, double> criter_split(const nc::NdArray<double>& X, const nc::NdArray<double>& Y);
 		};
 
-		DecisionTreeRegressor::DecisionTreeRegressor(std::string criterion, int max_depth, int max_features, double min_impurity_split = 1e-3):
+		DecisionTreeRegressor::DecisionTreeRegressor(std::string criterion, int max_depth, int max_features, double min_impurity_split):
 			criterion_(criterion),
 			max_depth_(max_depth),
 			max_features_(max_features),

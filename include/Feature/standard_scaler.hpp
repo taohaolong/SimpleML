@@ -32,14 +32,7 @@ namespace sm {
 		}
 
 		nc::NdArray<double> StandardScaler::transform(nc::NdArray<double>& X) {
-			nc::Shape shape = X.shape();
-			nc::NdArray<double> X_ss(shape);
-			for (int i = 0; i < shape.rows; i++)
-				for (int j = 0; j < shape.cols; ++j)
-					if (std::abs(var_(1, j)) < (1e-6))
-						X_ss(i, j) = X(i, j) / shape.rows;
-					else
-						X_ss(i, j) = (X(i, j) - mean_(0, j)) / var_(0, j);
+			nc::NdArray<double> X_ss = (X - mean_) / var_;
 
 			return X_ss;
 		}

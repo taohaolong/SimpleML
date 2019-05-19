@@ -43,6 +43,8 @@ namespace sm {
 
 //特征工程
 #include "Feature/standard_scaler.hpp"
+#include "Feature/min_max_scaler.hpp"
+#include "Feature/simple_imputer.hpp"
 
 //统计学习
 #include "Statistical Learning/decision_tree_classifier.hpp"
@@ -54,5 +56,9 @@ namespace sm {
 #include "Statistical Learning/linear_regression.hpp"
 #include "Statistical Learning/logistic_regression.hpp"
 #include "Statistical Learning/ridge_regression.hpp"
+
+//集成学习
+#include "Ensemble Learning/random_forest_classifier.hpp"
+#include "Ensemble Learning/random_forest_regressor.hpp"
 
 #endif

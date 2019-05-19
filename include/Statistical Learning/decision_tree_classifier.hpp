@@ -25,10 +25,12 @@ namespace sm {
 
 			void fit(const nc::NdArray<double>& X, const nc::NdArray<int>& Y);
 			nc::NdArray<int> predict(const nc::NdArray<double>& X);
+			nc::NdArray<int> predict_prob(const nc::NdArray<double>& X);
 
 		private:
 			int max_depth_;
 			int max_features_;
+			int n_classes_;
 			std::string criterion_;
 			std::vector<int> features_;
 
@@ -130,6 +132,8 @@ namespace sm {
 				features_ = sample(features_, max_features_);
 			}
 
+			n_classes_ = nc::unique(Y).size();
+
 			root_ = build_tree(X, Y);
 		}
 
@@ -139,6 +143,17 @@ namespace sm {
 			nc::NdArray<int> Y_predict(s.rows, 1);
 			for (int i = 0; i < s.rows; ++i) {
 				Y_predict[i] = classify(X(i, X.cSlice()), root_);
+			}
+
+			return Y_predict;
+		}
+
+		nc::NdArray<int> DecisionTreeClassifier::predict_prob(const nc::NdArray<double>& X)
+		{
+			nc::Shape s = X.shape();
+			nc::NdArray<int> Y_predict(s.rows, n_classes_);
+			for (int i = 0; i < s.rows; ++i) {
+				Y_predict(i, classify(X(i, X.cSlice()), root_)) = 1;
 			}
 
 			return Y_predict;
